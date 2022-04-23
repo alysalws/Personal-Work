@@ -43,6 +43,16 @@ def Transform():
     company_info_table=pd.read_csv('company_info.csv')
     financial_table=pd.merge(company_info_table,df5, on='ticker', how='right')
     financial_table=financial_table[['endDate','ticker','Security','ticker_id', 'totalAssets', 'totalLiab','totalStockholderEquity','totalRevenue','grossProfit','netIncome','totalCashFromOperatingActivities']]
+    
+    #convert the figures into millions
+    financial_table['totalAssets']=financial_table['totalAssets']/1000000
+    financial_table['totalLiab']=financial_table['totalLiab']/1000000
+    financial_table['totalStockholderEquity']=financial_table['totalStockholderEquity']/1000000
+    financial_table['totalRevenue']=financial_table['totalRevenue']/1000000
+    financial_table['grossProfit']=financial_table['grossProfit']/1000000
+    financial_table['netIncome']=financial_table['netIncome']/1000000
+    financial_table['totalCashFromOperatingActivities']=financial_table['totalCashFromOperatingActivities']/1000000
+    
     financial_table['endDate'] = pd.to_datetime(financial_table['endDate'])
     financial_table['endDate'] = financial_table['endDate'].apply(lambda x: x.strftime('%Y-%m'))
     financial_table.rename(columns={'endDate': "Month_year"}, inplace=True)
