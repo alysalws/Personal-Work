@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Extract
+
 # import all the required packages
 import pandas as pd
-!pip install yfinance
 import yfinance as yf
 import datetime
 from datetime import date
@@ -8,24 +12,18 @@ import time
 import requests
 import io
 import json
-!pip install yahoofinancials
 from yahoofinancials import YahooFinancials 
 from bs4 import BeautifulSoup
 import numpy as np
 import os
-import time
-!pip install yesg
 import yesg
-!pip install mfinancials
-!pip install yahoo_fin
 import yahoo_fin.stock_info as yfs
 from functools import reduce
 
 # Step 1 - Create functions to scrap data 
 
-# 1st function - Scrape the company information from Wikipedia
 def Extract():
-    
+    # 1st function - Scrape the company information from Wikipedia
     def company_info():
         payload=pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
         df = payload[0] # There are 2 tables on the Wikipedia page, we want the first table
@@ -33,7 +31,6 @@ def Extract():
         finance_df['ticker_id'] = np.arange(1, len(finance_df)+1)
         finance_df.rename(columns={"Symbol": "ticker"}, inplace=True)
         finance_df.drop(columns={"index"}).to_csv('company_info.csv')
-
     company_info()
     
     # Create an indexed list for SP500 companies in the finance sector
@@ -45,14 +42,13 @@ def Extract():
     finance_symbols = finance_df['ticker'].values.tolist()
 
     # 2nd function - Scrape the historical stockprices from YahooFinance API
-
     def stockprices_scraper():
         stock_final = pd.DataFrame()
         # iterate over each symbol
         for i in finance_symbols:  
             try:
-                # download the stock price from 2018-01-01 to current date
-                stock = yf.download(i,start='2018-01-01', end=date.today(), progress=False)
+                # download the stock price from 2020-01-01 onwards
+                stock = yf.download(i,start='2020-01-01', end=date.today(), progress=False)
                 # append the individual stock prices 
                 if len(stock) == 0:
                     pass
@@ -62,11 +58,9 @@ def Extract():
             except Exception:
                     None
         stock_final.to_csv('stockprices.csv')
-
     stockprices_scraper()
     
     # 3rd function - Scrape the Environment, Social and Governance (ESG) scores from Yahoo ESG API (Yesg)
-
     def ESG_scraper():
         ESG_final = pd.DataFrame()
         # iterate over each symbol
@@ -82,13 +76,12 @@ def Extract():
             except Exception:
                 None
         ESG_final.to_csv('ESG_scores.csv')
-
     ESG_scraper()
     
     # 4th function - Scrape the historical balance sheets from Yahoo Finance API
 
     def balance_sheet_scraper():
-        summarytable=pd.DataFrame()
+        balance_sheet_final=pd.DataFrame()
         # iterate over each symbol
         for ticker in finance_symbols: 
             try:
@@ -97,17 +90,15 @@ def Extract():
                     pass
                 else:
                     balance_sheet['ticker']=ticker
-                    summarytable=summarytable.append(balance_sheet, sort=False)       
+                    balance_sheet_final=balance_sheet_final.append(balance_sheet, sort=False)       
             except Exception:
                 None
-        summarytable.to_csv('balance_sheet.csv') 
-
+        balance_sheet_final.to_csv('balance_sheet.csv') 
     balance_sheet_scraper()
     
     # 5th function - Scrape the historical cash flow statements (cfs) from Yahoo Finance API
-
     def cfs_scraper():
-        summarytable=pd.DataFrame()
+        cfs_final=pd.DataFrame()
         # iterate over each symbol
         for ticker in finance_symbols: 
             try:
@@ -116,17 +107,16 @@ def Extract():
                     pass
                 else:
                     cfs['ticker']=ticker
-                    summarytable=summarytable.append(cfs, sort=False)
+                    cfs_final= cfs_final.append(cfs, sort=False)
             except Exception:
                 None
-        summarytable.to_csv('cfs.csv') 
+        cfs_final.to_csv('cfs.csv') 
     cfs_scraper()
     
     # 6th function - Scrape the historical income statements from Yahoo Finance API
-
     def income_statement_scraper():
         # iterate over each symbol
-        summarytable=pd.DataFrame()
+        income_statement_final=pd.DataFrame()
         for ticker in finance_symbols: 
             try:
                 income_statement=yfs.get_income_statement(ticker, yearly = True).T
@@ -134,11 +124,10 @@ def Extract():
                     pass
                 else:
                     income_statement['ticker']=ticker
-                    summarytable=summarytable.append(income_statement, sort=False)
+                    income_statement_final=income_statement_final.append(income_statement, sort=False)
             except Exception:
                 None
-        summarytable.to_csv('income_statement.csv') 
-
+        income_statement_final.to_csv('income_statement.csv') 
     income_statement_scraper()
 
     # 7th function - Scrape the glassdoor reviews of 2 companies (Citibank, JPMorgan) using Page2api
@@ -229,7 +218,6 @@ def Extract():
         JPMorgan_glassdoor_reviews=pd.json_normalize(data2,record_path='result__reviews')
         citi_glassdoor_reviews.to_csv('citibank_glassdoor_reviews.csv',index=None)
         JPMorgan_glassdoor_reviews.to_csv('JPmorgan_glassdoor_reviews.csv',index=None)
-
     glassdoor_scraper()
 
-Extract()
+#
