@@ -1,19 +1,23 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Load
+
+# In[1]:
+
+
 #install the required packages
-!pip install pyspark
 import os
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
 os.environ["SPARK_HOME"] = "/project/spark-3.2.1-bin-hadoop3.2"
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import countDistinct
 from pyspark.sql import SQLContext
-!pip3 install config
 import numpy as np 
 import pandas as pd 
 import pickle 
 import json 
 import random 
-import sqlalchemy 
-from sqlalchemy.types import * 
 
 # S3 and postgres
 import psycopg2 
@@ -21,24 +25,21 @@ import io
 from io import StringIO
 import boto3
 
-!pip install redshift_connector
-import redshift_connector
+# Connoect with Spark
+spark = SparkSession     .builder     .appName("PySpark App")     .config("spark.jars", "/project/postgresql-42.3.2.jar")     .getOrCreate()
+hostname = "database-1.ckkjqqmywcta.us-east-1.rds.amazonaws.com"
+dbname = "deproject"
+dbtable = "pp_schema"
+user = "alysalws"
+password = "Qwerty123"
+postgres_uri = "jdbc:postgresql://" + hostname + ":5432/" + dbname
 
-def Load():
+# Step 3 - Create a function to Load the data to S3 and RDS
+def Load1():
     #create a tuple for each table
     def df_to_tuple(df):
         tup = list(df.itertuples(index=False, name=None))
         return tup
-
-    # Set up S3 envireonment for connection
-    REGION = 'us-east-1'
-    ACCESS_KEY_ID = 'AKIAYTMSKI5VMAF3UZPK'
-    SECRET_ACCESS_KEY = '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'
-    BUCKET_NAME = 'deindividualproject'
-    s3csv = boto3.client('s3', 
-    region_name = REGION,
-    aws_access_key_id = ACCESS_KEY_ID,
-    aws_secret_access_key = SECRET_ACCESS_KEY)
 
     # Put the CSV files into S3
     obj1 = open('/project/company_financials (in millions).csv', 'rb')
@@ -47,6 +48,7 @@ def Load():
     obj4 = open('/project/company_stockprices.csv', 'rb')
     obj5 = open('/project/company_ESG_scores.csv', 'rb')
     obj6 = open('/project/year.csv', 'rb')
+    
     s3csv.put_object(Key='project/company_financials (in millions).csv', Body=obj1,Bucket=BUCKET_NAME)
     s3csv.put_object(Key='project/glassdoor_reviews_cleaned.csv', Body=obj2,Bucket=BUCKET_NAME)
     s3csv.put_object(Key='project/company_info.csv', Body=obj3,Bucket=BUCKET_NAME)
@@ -175,7 +177,6 @@ def Load():
             ratings float
             )
             """
-    
     cursor.execute(schema)
     cursor.execute(company)
     cursor.execute(year)
@@ -223,4 +224,3 @@ def Load():
     conn.commit()
     conn.close()
 
-Load()
