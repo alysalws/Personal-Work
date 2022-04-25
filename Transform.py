@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Transform
+
 # import all the required packages
 import pandas as pd
-!pip install yfinance
 import yfinance as yf
 import datetime
 from datetime import date
@@ -8,18 +12,18 @@ import time
 import requests
 import io
 import json
-!pip install yahoofinancials
 from yahoofinancials import YahooFinancials 
 from bs4 import BeautifulSoup
 import numpy as np
 import os
 import time
-!pip install yesg
 import yesg
+
+# Step 2 - Create functions to transform data 
 
 def Transform():
     #company_info table
-    company_info_table=pd.read_csv('company_info.csv').dropna()
+    company_info_table=pd.read_csv('info.csv').dropna()
     company_info_table=company_info_table.drop(columns=['Unnamed: 0'])
     company_info_table.to_csv('company_info.csv',index=None)   
 
@@ -31,7 +35,7 @@ def Transform():
     year_table=year_table.drop(columns=['Date'])
     year_table.to_csv('year.csv',index=None)
     
-    #financials_table
+    #financial_table
     df= pd.read_csv('balance_sheet.csv')
     df=df[['endDate','ticker', 'totalAssets', 'totalLiab','totalStockholderEquity']]
     df2= pd.read_csv('income_statement.csv')
@@ -43,8 +47,7 @@ def Transform():
     company_info_table=pd.read_csv('company_info.csv')
     financial_table=pd.merge(company_info_table,df5, on='ticker', how='right')
     financial_table=financial_table[['endDate','ticker','Security','ticker_id', 'totalAssets', 'totalLiab','totalStockholderEquity','totalRevenue','grossProfit','netIncome','totalCashFromOperatingActivities']]
-    
-    #convert the figures into millions
+    #convert the figures to millions
     financial_table['totalAssets']=financial_table['totalAssets']/1000000
     financial_table['totalLiab']=financial_table['totalLiab']/1000000
     financial_table['totalStockholderEquity']=financial_table['totalStockholderEquity']/1000000
@@ -52,7 +55,6 @@ def Transform():
     financial_table['grossProfit']=financial_table['grossProfit']/1000000
     financial_table['netIncome']=financial_table['netIncome']/1000000
     financial_table['totalCashFromOperatingActivities']=financial_table['totalCashFromOperatingActivities']/1000000
-    
     financial_table['endDate'] = pd.to_datetime(financial_table['endDate'])
     financial_table['endDate'] = financial_table['endDate'].apply(lambda x: x.strftime('%Y-%m'))
     financial_table.rename(columns={'endDate': "Month_year"}, inplace=True)
@@ -62,7 +64,7 @@ def Transform():
     financial_table=financial_table.dropna()
     financial_table['index'] = np.arange(1, len(financial_table)+1)
     financial_table['ticker_id']= financial_table['ticker_id'].astype(int)
-    financial_table.to_csv('company_financials.csv',index=None)     
+    financial_table.to_csv('company_financials (in millions).csv',index=None)     
     
     #ESG_table
     df= pd.read_csv('ESG_scores.csv')
@@ -112,4 +114,4 @@ def Transform():
     stockprices_table=stockprices_table[["index","ticker_id","ticker","Security","Date","Month_year", "Month_year_id","Open", "High","Low","Close","Adj Close","Volume"]]
     stockprices_table.to_csv('company_stockprices.csv', index=None)
 
-Transform()
+
