@@ -144,5 +144,5 @@ def Load2():
                 server.login(multipart["From"], password)
                 server.sendmail(multipart["From"], multipart["To"], multipart.as_string())
                 server.quit()
-    send_email(['alysalws@gmail.com'],'Top 10 Stocks by stockprices change', stats5)
+    send_email(['alysalws@gmail.com'],'Top 10 Stocks by stockprices change', stats5)  # the receiver email address can be changed to any email address
 
