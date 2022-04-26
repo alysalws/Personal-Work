@@ -85,11 +85,11 @@ with DAG(
     dag_id='ETL_DAG_v2',
     description="ETL for financial companies in S&P500 ticker",
     schedule_interval='@daily', 
-    start_date=pendulum.datetime(2022, 4, 25, tz="UTC"),
+    start_date=pendulum.datetime(2022, 4, 26, tz="UTC"),
     catchup=False,
     default_args={
     "owner":"alysalws",
-    "depends_on_past": False,
+    "depends_on_past": True,
     "retries": 1,
     "retry_delay": datetime.timedelta(minutes=3)},
     tags=['ETL']) as dag:
