@@ -32,8 +32,8 @@ def Extract():
     stock_final = pd.DataFrame()
     for i in finance_symbols:  
         try:
-            stock = yf.download(i,start='2020-01-01', end=date.today(), progress=False) 
-            # download the stock price from 2020-01-01 onwards
+            stock = yf.download(i,start='2021-01-01', end=date.today(), progress=False) 
+            # download the stock price from 2021-01-01 onwards
             if len(stock) == 0:
                 pass
             else:
@@ -46,15 +46,15 @@ def Extract():
     # Scrape the Environment, Social and Governance (ESG) scores from Yahoo ESG API (Yesg)
     ESG_final = pd.DataFrame()
     for i in finance_symbols:  
-            try:
-                ESG = yesg.get_historic_esg(i)
-                if len(ESG) == 0:
-                    pass
-                else:
-                    ESG['Name']=i
-                    ESG_final = ESG_final.append(ESG,sort=False)
-            except Exception:
-                None
+        try:
+            ESG = yesg.get_historic_esg(i)
+            if len(ESG) == 0:
+                pass
+            else:
+                ESG['Name']=i
+                ESG_final = ESG_final.append(ESG,sort=False)
+        except Exception:
+            None
     ESG_final.to_csv('ESG_scores.csv')
      
     # Scrape the historical balance sheets from Yahoo Finance API
@@ -106,7 +106,7 @@ def Extract():
     def glassdoor_scraper():
         api_url = 'https://www.page2api.com/api/v1/scrape'
         payload = {
-              "api_key": "c650edfad94afab7c7e8fffa947cf89f8c162d13",
+              "api_key": "923b14e27effbd37f71558cad97d2da20eb18b0f", #if the API does not work, that means it exceeds the free credit limit.
               "url": "https://www.glassdoor.co.uk/Reviews/Citi-Reviews-E8843.htm", #citibank
               "real_browser": True,
               "merge_loops": True,
@@ -135,7 +135,7 @@ def Extract():
             }
 
         payload2 = {
-              "api_key": "c650edfad94afab7c7e8fffa947cf89f8c162d13",
+              "api_key": "923b14e27effbd37f71558cad97d2da20eb18b0f", #if the API does not work, that means it exceeds the free credit limit.
               "url": "https://www.glassdoor.co.uk/Reviews/J-P-Morgan-Reviews-E145.htm", #JPMorgan
               "real_browser": True,
               "merge_loops": True,
