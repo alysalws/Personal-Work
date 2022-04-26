@@ -132,7 +132,8 @@ def Extract():
     
     # 7th function - Scrape the glassdoor reviews of 2 companies (Citibank, JPMorgan) using Page2api
 
-    # If the API Key is no longer working, that means all free credits have been consumed and a new one has to be created on https://www.page2api.com
+    # If error 'result__reviews' pops up, that means the number of API calls reached the limit, or the key is no longer working because all free credits have been consumed.
+       # Solution: create a new API on https://www.page2api.com
     
     api_url = 'https://www.page2api.com/api/v1/scrape'
     payload = {
