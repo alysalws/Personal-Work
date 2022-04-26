@@ -27,7 +27,7 @@ wb = Workbook()
 ws = wb.active
 ws.append(['Date', 'Author','Pros','Cons'])
 
-user_agents_file = open("C:/Users/Alysa/Documents/UCL/UCL/2- MSIN0166 Data Engineering/Individual project/user-agents.txt", 'r')
+user_agents_file = open("C:/Users/Alysa/Documents/UCL/UCL/2- MSIN0166 Data Engineering/Individual project/user-agents.txt", 'r') # edit the folder path 
 useragents = list(user_agents_file.readlines())
 us_ag = np.random.choice(useragents).replace("\n", '')
 headers = {
@@ -42,7 +42,7 @@ options = Options()
 options.add_argument("--window-size=1920,1080")
 options.add_argument(f'headers={headers}')
 
-path = os.path.abspath("C:/Users/Alysa/chromedriver_win32 (1)/chromedriver.exe")
+path = os.path.abspath("C:/Users/Alysa/chromedriver_win32 (1)/chromedriver.exe") # edit the file path
 driver = webdriver.Chrome(executable_path=path, options=options)
 driver.get('https://www.glassdoor.co.uk/profile/login_input.htm?%27')
 
