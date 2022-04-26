@@ -127,7 +127,7 @@ def Load2():
                 ORDER BY AVG(glassdoor_reviews.ratings) \
                 LIMIT 10"
 
-    # Query 2: Top 10 companies by highest average stockprices from 2020 to 2021 
+    # Query 2: Top 10 companies by highest average stockprices in 2021
     query2 = "SELECT stockprices.ticker, company.security, ROUND((AVG(stockprices.high) + AVG(stockprices.low)/ 2),2) as Avg_stockprices\
                 FROM stockprices \
                 INNER JOIN company ON stockprices.ticker = company.ticker \
