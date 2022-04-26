@@ -22,8 +22,9 @@ import boto3
 import io
 from io import StringIO, BytesIO
 import boto3
-# Step 1 - Create functions to scrap data 
 
+
+# Set up S3 environment
 REGION = 'us-east-1'
 ACCESS_KEY_ID = 'AKIAYTMSKI5VMAF3UZPK'
 SECRET_ACCESS_KEY = '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'
@@ -33,9 +34,10 @@ s3csv = boto3.client('s3',
         aws_access_key_id = ACCESS_KEY_ID,
         aws_secret_access_key = SECRET_ACCESS_KEY)
 
+# Step 1 - Create functions to scrap data 
 
 def Extract():
-    
+    # function to save the file in S3
     def save_csv_s3(df, folder, name):
         csv_buffer=StringIO()
         df.to_csv(csv_buffer, index=True)
@@ -46,8 +48,8 @@ def Extract():
     # Scrape company information from Wikipedia
     payload=pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
     df = payload[0] # There are 2 tables on the Wikipedia page, we want the first table
-    finance_df = df[df['GICS Sector'] == 'Financials'].reset_index().drop(['SEC filings','CIK'],axis=1)
-    finance_df['ticker_id'] = np.arange(1, len(finance_df)+1)
+    finance_df = df[df['GICS Sector'] == 'Financials'].reset_index().drop(['SEC filings','CIK'],axis=1) # only scraping details of financial companies
+    finance_df['ticker_id'] = np.arange(1, len(finance_df)+1) # create ticker_id for each company
     finance_df.rename(columns={"Symbol": "ticker"}, inplace=True)
     #finance_df=finance_df.drop(columns={"index"}).to_csv('info.csv')
      # Create an indexed list for SP500 companies in the finance sector
@@ -58,7 +60,7 @@ def Extract():
     for i in finance_symbols:  
         try:
             stock = yf.download(i,start='2021-01-01', end=date.today(), progress=False) 
-            # download the stock price from 2021-01-01 onwards
+            # only download the stock price from 2021-01-01 onwards
             if len(stock) == 0:
                 pass
             else:
@@ -72,7 +74,8 @@ def Extract():
     ESG_final = pd.DataFrame()
     for i in finance_symbols:  
         try:
-            ESG = yesg.get_historic_esg(i) # if the message 'something wrong with the symbol...' pops up, wait for at least 15 minutes to run the file again.
+            ESG = yesg.get_historic_esg(i) # if the message 'An error has occured....' pops up more than twice, it means the API rate limit has been reached.
+                                           # The solution is to wait for at least 15 minutes and run the file again.
             if len(ESG) == 0:
                 pass
             else:
@@ -128,13 +131,13 @@ def Extract():
     #income_statement_final.to_csv('income_statement.csv') 
     
     # 7th function - Scrape the glassdoor reviews of 2 companies (Citibank, JPMorgan) using Page2api
-    # If the API Key is no longer working, that means all free credits have been consumed and 
-    #we need to create a new one by registering a new account at https://www.page2api.com
+
+    # If the API Key is no longer working, that means all free credits have been consumed and a new one has to be created on https://www.page2api.com
     
     api_url = 'https://www.page2api.com/api/v1/scrape'
     payload = {
-          "api_key": "923b14e27effbd37f71558cad97d2da20eb18b0f",
-          "url": "https://www.glassdoor.co.uk/Reviews/Citi-Reviews-E8843.htm", #citibank
+          "api_key": "923b14e27effbd37f71558cad97d2da20eb18b0f", # API Personal Key
+          "url": "https://www.glassdoor.co.uk/Reviews/Citi-Reviews-E8843.htm", # Link to Citibank's Glassdoor Review Page
           "real_browser": True,
           "merge_loops": True,
           "premium_proxy": "us",
@@ -163,7 +166,7 @@ def Extract():
 
     payload2 = {
           "api_key": "923b14e27effbd37f71558cad97d2da20eb18b0f",
-          "url": "https://www.glassdoor.co.uk/Reviews/J-P-Morgan-Reviews-E145.htm", #JPMorgan
+          "url": "https://www.glassdoor.co.uk/Reviews/J-P-Morgan-Reviews-E145.htm", # Link to JPMorgan's Glassdoor Review Page
           "real_browser": True,
           "merge_loops": True,
           "premium_proxy": "us",
@@ -216,6 +219,7 @@ def Extract():
     #citi_glassdoor_reviews.to_csv('citibank_glassdoor_reviews.csv',index=None)
     #JPMorgan_glassdoor_reviews.to_csv('JPmorgan_glassdoor_reviews.csv',index=None)
     
+    # Save the file in S3
     save_csv_s3(finance_df, 'RawData', 'Company Information (raw)')
     save_csv_s3(stock_final, 'RawData', 'Stockprices (raw)')
     save_csv_s3(JPMorgan_glassdoor_reviews, 'RawData', 'JPM Glassdoor Reviews (raw)')
