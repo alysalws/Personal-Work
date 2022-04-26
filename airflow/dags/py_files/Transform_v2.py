@@ -32,14 +32,14 @@ s3csv = boto3.client('s3',
 # Step 2 - Create functions to transform data 
 
 def Transform():
-    
+    # Function to save file to S3 in CSV file format
     def save_csv_s3(df, folder, name):
         csv_buffer=StringIO()
         df.to_csv(csv_buffer, index=True)
         response=s3csv.put_object(Body=csv_buffer.getvalue(),
                                Bucket=BUCKET_NAME,
                                Key=folder + "/" + name + ".csv")
-                           
+    # Read data from S3 bucket using Pandas
     obj1 = s3csv.get_object(Bucket= BUCKET_NAME , Key = 'RawData/Company Information (raw).csv')
     obj2 = s3csv.get_object(Bucket= BUCKET_NAME , Key = 'RawData/Stockprices (raw).csv')
     obj3 = s3csv.get_object(Bucket= BUCKET_NAME , Key = 'RawData/JPM Glassdoor Reviews (raw).csv')
@@ -58,24 +58,26 @@ def Transform():
     ESG = pd.read_csv(io.BytesIO(obj8['Body'].read()), encoding='utf8')
     company_info_table = pd.read_csv(io.BytesIO(obj1['Body'].read()), encoding='utf8')
     
-    #company_info_table
+    # create company_info_table
     company_info_table=company_info_table.drop(columns=['Unnamed: 0'])
     
-    #year_table
+    # create year_table
     rng = pd.date_range('2012-01', periods=400, freq='M')   #create an array of 400 dates starting at '2012-01', one per month
-    year_table = pd.DataFrame({ 'Date': rng, 'Month_year_id': np.arange(1, len(rng)+1)})
+    year_table = pd.DataFrame({ 'Date': rng, 'Month_year_id': np.arange(1, len(rng)+1)}) # create Month_year_id
     year_table['Date'] = pd.to_datetime(year_table['Date'])
     year_table['Month_year'] = year_table['Date'].apply(lambda x: x.strftime('%Y-%m'))
     year_table=year_table.drop(columns=['Date'])
     
-    #financial_table
+    # create financial_table
     balance_sheet=balance_sheet[['endDate','ticker', 'totalAssets', 'totalLiab','totalStockholderEquity']]
     income_statement=income_statement[['endDate','ticker','totalRevenue','grossProfit','netIncome']]
     cfs=cfs[['endDate','ticker','totalCashFromOperatingActivities']]
+    # Keep 7 financial indicators only   
     df4 = pd.merge(balance_sheet,income_statement, on=['endDate','ticker'], how='right')
     df5 = pd.merge(df4,cfs, on=['endDate','ticker'], how='right')
     financial_table=pd.merge(company_info_table,df5, on='ticker', how='right')
     financial_table=financial_table[['endDate','ticker','Security','ticker_id', 'totalAssets', 'totalLiab','totalStockholderEquity','totalRevenue','grossProfit','netIncome','totalCashFromOperatingActivities']]
+    # Convert the figures into Millions
     financial_table['totalAssets']=financial_table['totalAssets']/1000000
     financial_table['totalLiab']=financial_table['totalLiab']/1000000
     financial_table['totalStockholderEquity']=financial_table['totalStockholderEquity']/1000000
@@ -87,13 +89,13 @@ def Transform():
     financial_table['endDate'] = financial_table['endDate'].apply(lambda x: x.strftime('%Y-%m'))
     financial_table.rename(columns={'endDate': "Month_year"}, inplace=True)
     financial_table=pd.merge(year_table, financial_table, on='Month_year', how='right')
-    financial_table=financial_table[financial_table.Month_year != 'TTM']
+    financial_table=financial_table[financial_table.Month_year != 'TTM']     # Dropping irrelevant rows 
     financial_table["Month_year_id"]=financial_table["Month_year_id"].astype(int)
     financial_table=financial_table.dropna()
     financial_table['index'] = np.arange(1, len(financial_table)+1)
     financial_table['ticker_id']= financial_table['ticker_id'].astype(int)
     
-    #ESG_table
+    # create ESG_table
     ESG['Date'] = pd.to_datetime(ESG['Date'])
     ESG['Month_year'] =ESG['Date'].apply(lambda x: x.strftime('%Y-%m'))
     ESG.rename(columns={"Name": "ticker"}, inplace=True)
@@ -104,13 +106,13 @@ def Transform():
     ESG_table['index'] = np.arange(1, len(ESG_table)+1)
     ESG_table=ESG_table[["index","ticker","ticker_id","Security","Date", "Month_year","Month_year_id","E-Score","S-Score","G-Score","Total-Score"]]
     
-    #Glassdoor_table
+    # create Glassdoor_table
     Citi['ticker']='C'
     Citi['ticker_id']=19
     JPM['ticker']='JPM'
     JPM['ticker_id']=36
     Glassdoor_table=Citi.append(JPM).reset_index(drop=True)
-    Glassdoor_table['pros']=Glassdoor_table['pros'].str.replace('-','')
+    Glassdoor_table['pros']=Glassdoor_table['pros'].str.replace('-','') # removing special characters in reviews
     Glassdoor_table['pros']=Glassdoor_table['pros'].str.replace('=','')
     Glassdoor_table['cons']=Glassdoor_table['cons'].str.replace('-','')
     Glassdoor_table['cons']=Glassdoor_table['cons'].str.replace('=','')
@@ -123,7 +125,7 @@ def Transform():
     Glassdoor_table['index'] = np.arange(1, len(Glassdoor_table)+1)
     Glassdoor_table= Glassdoor_table[["index","ticker","ticker_id","date", "Month_year","Month_year_id", "author","pros","cons","rating"]]
     
-    #stockprices_table
+    # create stockprices_table
     stockprices['Date'] = pd.to_datetime(stockprices['Date'])
     stockprices['Month_year'] =stockprices['Date'].apply(lambda x: x.strftime('%Y-%m'))
     stockprices.rename(columns={"Name": "ticker"}, inplace=True)
@@ -134,7 +136,7 @@ def Transform():
     stockprices_table['index'] = np.arange(1, len(stockprices_table)+1)
     stockprices_table=stockprices_table[["index","ticker_id","ticker","Security","Date","Month_year", "Month_year_id","Open", "High","Low","Close","Adj Close","Volume"]]
     
-    # save the cleaned data to S3
+    # save the cleaned tables to S3
     save_csv_s3(financial_table, 'project', 'company_financials (in USD millions)')
     save_csv_s3(Glassdoor_table, 'project','glassdoor_reviews_cleaned')
     save_csv_s3(company_info_table, 'project','company_info')
