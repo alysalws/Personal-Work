@@ -23,6 +23,7 @@ import boto3
 # Connoect with Spark
 spark = SparkSession     .builder     .appName("PySpark App")     .config("spark.jars", "/project/postgresql-42.3.2.jar")     .getOrCreate()
 
+# Set up RDS and PostgreSQL
 hostname = "database-1.ckkjqqmywcta.us-east-1.rds.amazonaws.com"
 dbname = "deproject"
 dbtable = "pp_schema"
@@ -37,7 +38,7 @@ def Load1():
         tup = list(df.itertuples(index=False, name=None))
         return tup
 
-    # Read the CSV file using pandas
+    # Read the CSV file from S3 using pandas
     obj1 = s3csv.get_object(Bucket= BUCKET_NAME , Key = 'project/company_financials (in millions).csv')
     obj2 = s3csv.get_object(Bucket= BUCKET_NAME , Key = 'project/glassdoor_reviews_cleaned.csv')
     obj3 = s3csv.get_object(Bucket= BUCKET_NAME , Key = 'project/company_info.csv')
