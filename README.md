@@ -2,7 +2,7 @@
 
 This project is about building an Extract, Transform and Load (ETL) pipeline with Apache Airflow that can automate the consolidation and update process of a variety of structured and unstructured data extracted from online sources for 66 financial companies listed on S&P 500. The ETL process involves the use of Amazon S3, Amazon Relational Database Service (RDS) (free-tier) as the data warehouses for data storage, Jupyter Notebook hosted on a cloud-based platform named Faculty.ai to write the scripts, and Python and Spark (SQL) as the scripting languages to transform and query the database. All scripts are version controlled on Github and the orchestration of the tasks is managed by Apache Airflow.  
 
-This Github repository stores two sets  of py files that can be run on faculty (in the 'faculty folder), and on Airflow (in the 'Airflow' folder). To execute Airflow on Faculty, all paths that can be read in the airflow.config file should be changed from /home/faculty/ to /project, which is where I store my airflow folder.
+This Github repository stores two sets  of py files that can be run on faculty (in the 'faculty' folder), and on Airflow (in the 'Airflow' folder). To execute Airflow on Faculty, all file paths in the 'airflow.config' file should be changed from '/home/faculty/' to '/project', which is the directory where I store my airflow folder.
 
 To connect to Spark, run the following commands on Server: 
 1. sudo apt-get -y update
