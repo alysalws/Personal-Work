@@ -1,8 +1,18 @@
-This project is about building an Extract, Transform and Load (ETL) pipeline with Apache Airflow that can automate the consolidation and update process of a variety of structured and unstructured data extracted from online sources for 66 financial companies listed on S&P 500. The ETL process involves the use of Amazon S3, Amazon Relational Database Service (RDS) (free-tier) as the data warehouses for data storage, Jupyter Notebook hosted on a cloud-based platform named Faculty.ai to write the scripts, and Python and Spark (SQL) as the scripting languages to transform and query the database. All scripts are version controlled on Github and the orchestration of the tasks is managed by Apache Airflow. No Machine Learning model has been deployed for this project in consideration of immense chanllenge of predicting company's performance base on a small dataset.
+The objective of this project is to build an ETL pipeline to source, transform and manipulate online data from more than 4 different sources and use Apache Workflow to automate the workflow. The ETL pipeline uses Amazon S3 (AWS free tier) for data storage, Amazon RDS (PostgreSQL database) for hosting the metadata schema, and Faculty.ai as the main scripting platform.
 
-This Github repository stores two sets of .py files that can be run on faculty (in the 'faculty' folder), and on Airflow (in the 'airflow' folder). Please note that only the .py files in these two folders are the final and executable versions. For files in 'Other' folder and 'Work file' folder, they consists of the working files that were built but not deployed. 
+Data sourced: 
+![image](https://github.com/user-attachments/assets/7d459760-d083-41a2-b5f6-806fbaa8ff35)
 
-To execute Airflow on Faculty, all file paths in the 'airflow.config' file should be changed from '/home/faculty/' to '/project', which is the directory where I store my airflow folder.
+Schema:
+![image](https://github.com/user-attachments/assets/991b0d9e-3771-43a1-a613-3b6ccf7a712d)
+1. <company_info_table> consists of the information of the financial companies trading on S&P 500. A ticker_id is designated the Primary Key (PK) to identify the 66 tickers.
+2. <year_table> consists of 400 (adjustable in the Python script) months following January 2012. A month_year_id is designated the Primary Key (PK) to identify the 400 months.
+3. <company_financials_table> consists of 7 financial indicators of the companies based on their annual reports. An index is designated the Primary Key to identify every row in them table. The ticker_id and month_year_id are the Foreign Keys that reference <company_info_table> and <year_table> . Worth noting that only 7 out of 56 financial indicators were stored in the dataframe with the intention to simplify the design of the schema in this project.
+4. <company_stockprices_table> consists of the stock prices data. An index is designated the Primary Key to identify every row in the table. The ticker_id and month_year_id are the Foreign Keys that reference <company_info_table> and <year_table> .
+5. <company_esg_scores_table> consists of 3 sustainability scores (E-score, S-score, G-score) of the companies. An index is designated the Primary Key to identify every row in the table. The ticker_id and month_year_id are the Foreign Keys that reference <company_info_table> and <year_table> .
+6. <company_glassdoor_reviews_table> consists of the Glassdoor comments, ratings, and details of the reviewer. An index is designated the Primary Key to identify every row in  the table. The ticker_id and month_year_id are the Foreign Keys that reference <company_info_table> and <year_table> .
+
+This Github repository stores two sets of .py files that can be run on faculty (in the 'faculty' folder), and on Airflow (in the 'airflow' folder). 
 
 To connect to Spark, run the following commands on Server: 
 1. sudo apt-get -y update
@@ -15,4 +25,4 @@ To connect to Spark, run the following commands on Server:
 8. pip install -q findspark
 9. pip install pyspark
 
-Disclaimer: This project is for purely for academic purposes. Contributor of this Github retains full copyright ownership of the content.
+Disclaimer: This project is for purely for personal research purposes. Contributor of this Github retains full copyright ownership of the content.
