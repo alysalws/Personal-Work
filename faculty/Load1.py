@@ -27,8 +27,8 @@ spark = SparkSession \
 hostname = "database-1.ckkjqqmywcta.us-east-1.rds.amazonaws.com"
 dbname = "deproject"
 dbtable = "pp_schema"
-user = "alysalws"
-password = "Qwerty123"
+user = ""
+password = ""
 postgres_uri = "jdbc:postgresql://" + hostname + ":5432/" + dbname
 
 # Step 3 - Create a function to Load the data to S3 and RDS
