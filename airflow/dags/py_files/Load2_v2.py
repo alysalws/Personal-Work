@@ -46,9 +46,9 @@ def Load2():
     
     # Putting the panda dataframes in Parquet format in s3 bucket
     REGION = 'us-east-1'
-    ACCESS_KEY_ID = 'AKIAYTMSKI5VMAF3UZPK'
-    SECRET_ACCESS_KEY = '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'
-    BUCKET_NAME = 'deindividualproject'
+    ACCESS_KEY_ID = '#####'
+    SECRET_ACCESS_KEY = '####'
+    BUCKET_NAME = '#####'
 
     s3parquet = boto3.client('s3', 
          region_name = REGION,
