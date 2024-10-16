@@ -23,6 +23,7 @@ This Github repository stores two sets of .py files that can be run on faculty (
 6. <company_glassdoor_reviews_table> consists of the Glassdoor comments, ratings, and details of the reviewer. An index is designated the Primary Key to identify every row in  the table. The ticker_id and month_year_id are the Foreign Keys that reference <company_info_table> and <year_table> .
 
 **Notes:** 
+
 To connect to Spark, run the following commands on Server: 
 1. sudo apt-get -y update
 2. sudo apt-get -y upgrade
