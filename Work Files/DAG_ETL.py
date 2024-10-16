@@ -66,14 +66,14 @@ hostname = "database-1.ckkjqqmywcta.us-east-1.rds.amazonaws.com"
 dbname = "deproject"
 dbtable = "pp_schema"
 user = "alysalws"
-password = "Qwerty123"
+password = "####"
 postgres_uri = "jdbc:postgresql://" + hostname + ":5432/" + dbname
 
 # Set up S3 envireonment for connection
 REGION = 'us-east-1'
-ACCESS_KEY_ID = 'AKIAYTMSKI5VMAF3UZPK'
-SECRET_ACCESS_KEY = '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'
-BUCKET_NAME = 'deindividualproject'
+ACCESS_KEY_ID = '#####'
+SECRET_ACCESS_KEY = '#####'
+BUCKET_NAME = '#####'
 s3csv = boto3.client('s3', 
 region_name = REGION,
 aws_access_key_id = ACCESS_KEY_ID,
