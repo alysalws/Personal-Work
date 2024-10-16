@@ -66,7 +66,7 @@ hostname = "database-1.ckkjqqmywcta.us-east-1.rds.amazonaws.com"
 dbname = "deproject"
 dbtable = "pp_schema"
 user = "alysalws"
-password = "####"
+password = ""
 postgres_uri = "jdbc:postgresql://" + hostname + ":5432/" + dbname
 
 # Set up S3 envireonment for connection
