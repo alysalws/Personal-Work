@@ -1,4 +1,5 @@
 **Projective Description and Objectives:**
+
 The objective of this project is to build an ETL pipeline to source, transform and manipulate online data from more than 4 different sources and use Apache Workflow to automate the workflow. The ETL pipeline uses Amazon S3 (AWS free tier) for data storage, Amazon RDS (PostgreSQL database) for hosting the metadata schema, and Faculty.ai as the main scripting platform.
 
 This Github repository stores two sets of .py files that can be run on faculty (in the 'faculty' folder), and on Airflow (in the 'airflow' folder). 
